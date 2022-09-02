@@ -2199,6 +2199,9 @@
     "/logonews/": [
         "nczitzk"
     ],
+    "/loltw/news/:category?": [
+        "hoilc"
+    ],
     "/lovelive-anime/news/:option?": [
         "axojhf"
     ],
@@ -2372,6 +2375,9 @@
     ],
     "/newsmarket/:category?": [
         "nczitzk"
+    ],
+    "/nextapple/realtime/:category?": [
+        "miles170"
     ],
     "/nga/forum/:fid/:recommend?": [
         "xyqfer"
