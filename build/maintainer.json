@@ -1264,6 +1264,9 @@
     "/gf-cn/news/:category?": [
         "nczitzk"
     ],
+    "/gihyo/list/group/:id": [
+        "masakichi"
+    ],
     "/gitee/commits/:owner/:repo": [
         "TonyRL"
     ],
@@ -3796,6 +3799,9 @@
         "nczitzk"
     ],
     "/wdc/download/:id": [
+        "nczitzk"
+    ],
+    "/web3caff/:path?": [
         "nczitzk"
     ],
     "/wechat/announce": [
