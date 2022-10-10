@@ -905,6 +905,9 @@
     "/dockerhub/tag/:owner/:image": [
         "outloudvi"
     ],
+    "/docschina/jsweekly": [
+        "daijinru"
+    ],
     "/domp4/detail/:id": [
         "savokiss"
     ],
@@ -3126,7 +3129,8 @@
         "nczitzk"
     ],
     "/qipamaijia/:cate?": [
-        "Fatpandac"
+        "Fatpandac",
+        "nczitzk"
     ],
     "/qm120/news/:category?": [
         "nczitzk"
@@ -4048,6 +4052,9 @@
     ],
     "/wikinews/latest": [
         "KotoriK"
+    ],
+    "/wise/pair/:source/:target": [
+        "HenryQW"
     ],
     "/wizfile/updates": [
         "Fatpandac"
@@ -5000,7 +5007,6 @@
     "/tprtc/news": [],
     "/archdaily": [],
     "/aptonic/action/:untested?": [],
-    "/docschina/jsweekly": [],
     "/im2maker/:channel?": [],
     "/cninfo/announcement/:column/:code/:orgId/:category?/:search?": [],
     "/jinshi/index": [],
@@ -5157,7 +5163,6 @@
     "/itslide/new": [],
     "/remote-work/:caty?": [],
     "/chinatimes/:caty": [],
-    "/transferwise/pair/:source/:target": [],
     "/chocolatey/software/:name?": [],
     "/bahamut/creation/:author/:category?": [],
     "/bahamut/creation_index/:category?/:subcategory?/:type?": [],
