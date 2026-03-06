@@ -12587,7 +12587,7 @@
           "/detail/:id",
           "/detail/:id"
         ],
-        "target": "/comic-walker/manga/:id"
+        "target": "/comic-walker/comic-walker/manga/:id"
       }
     ]
   },

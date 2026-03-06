@@ -5889,7 +5889,7 @@
         docs:"https://docs.rsshub.app/routes/anime",
         source:[ "/detail/:id",
           "/detail/:id" ],
-        target:"/comic-walker/manga/:id" } ] },
+        target:"/comic-walker/comic-walker/manga/:id" } ] },
   "comicskingdom.com":{ _name:"Comics Kingdom",
     ".":[ { title:"Archive",
         docs:"https://docs.rsshub.app/routes/anime",
