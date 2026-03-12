@@ -566,6 +566,8 @@ export type RoutePath =
   | `/civitai/user/:username/articles`
   | `/ciweimao/chapter/:id`
   | `/cjlu/yjsy/:cate`
+  | `/claude/blog`
+  | `/claude/code/changelog`
   | `/clickme/:site/:grouping/:name`
   | `/cline/blog`
   | `/cloudflarestatus/`
@@ -2251,12 +2253,12 @@ export type RoutePath =
   | `/pnas/:topicPath{.+}?`
   | `/podwise/explore`
   | `/podwise/explore/:type`
-  | `/pornhub/category/:caty`
-  | `/pornhub/category_url/:url?/:language?`
-  | `/pornhub/model/:username/:language?/:sort?`
-  | `/pornhub/pornstar/:username/:language?/:sort?`
-  | `/pornhub/search/:keyword`
-  | `/pornhub/users/:username/:language?`
+  | `/pornhub/category/:caty/:img?`
+  | `/pornhub/category_url/:url?/:language?/:img?`
+  | `/pornhub/model/:username/:language?/:sort?/:img?`
+  | `/pornhub/pornstar/:username/:language?/:sort?/:img?`
+  | `/pornhub/search/:keyword/:img?`
+  | `/pornhub/users/:username/:language?/:img?`
   | `/postman/release-notes`
   | `/priconne-redive/news/:server?`
   | `/producereport/:category{.+}?`
@@ -2326,6 +2328,7 @@ export type RoutePath =
   | `/qq/kg/:userId`
   | `/qq/kg/reply/:playId`
   | `/qq/lol/news/:category?`
+  | `/qq/news/:uid/:detail?`
   | `/qq/pd/guild/:id/:sub?/:sort?`
   | `/qq/weread/:category`
   | `/qq88/:category?`
@@ -2462,6 +2465,7 @@ export type RoutePath =
   | `/sdu/wh/jwc/:column?`
   | `/sdu/wh/news/:column?`
   | `/sdu/ygb/:type?`
+  | `/sdu/yz/:type?`
   | `/sdust/yjsy/zhaosheng/:id?`
   | `/sdzk/:bcid?/:cid?`
   | `/sec-in/`
