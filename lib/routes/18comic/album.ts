@@ -24,11 +24,11 @@ export const route: Route = {
         },
     ],
     name: '专辑',
-    maintainers: ['nczitzk'],
+    maintainers: ['nczitzk', 'pseudoyu'],
     handler,
     url: 'jmcomic.group/',
     description: `::: tip
-  专辑 id 不包括 URL 中标题的部分。
+专辑 id 不包括 URL 中标题的部分。
 :::`,
 };
 

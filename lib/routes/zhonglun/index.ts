@@ -84,18 +84,16 @@ export const handler = async (ctx) => {
 };
 
 export const route: Route = {
-    path: '/research/article/:language{[a-zA-Z0-9-]+}?',
+    path: '/research/article/:language?',
     name: '中伦研究专业文章',
     url: 'zhonglun.com',
     maintainers: ['nczitzk'],
     handler,
     example: '/zhonglun/research/article/zh',
     parameters: { category: '语言，默认为 zh，即简体中文，可在对应分类页 URL 中找到' },
-    description: `
-| ENG | 简体中文 | 日本語 | 한국어 |
+    description: `| ENG | 简体中文 | 日本語 | 한국어 |
 | --- | -------- | ------ | ------ |
-| en  | zh       | ja     | kr     |
-    `,
+| en  | zh       | ja     | kr     |`,
     categories: ['new-media'],
 
     features: {

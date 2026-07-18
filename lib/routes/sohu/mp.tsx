@@ -23,8 +23,9 @@ export const route: Route = {
     maintainers: ['HenryQW'],
     handler,
     description: `搜狐号 ID 可以通过以下方式获取：
-  1.  通过浏览器搜索相关搜狐号 \`果壳 site: mp.sohu.com\`。
-  2.  通过浏览器控制台执行 \`window.globalConst.mkeyConst_mkey\`，返回的即为搜狐号 ID。`,
+
+1. 通过浏览器搜索相关搜狐号 \`果壳 site: mp.sohu.com\`。
+2. 通过浏览器控制台执行 \`window.globalConst.mkeyConst_mkey\`，返回的即为搜狐号 ID。`,
 };
 
 function randomString(length = 32) {
@@ -218,7 +219,7 @@ async function handler(ctx) {
         title: `搜狐号 - ${globalConst.title}`,
         description: briefIntroductionCard.column_9_text,
         link: originalRequest.url,
-        image: `https:${briefIntroductionCard.column_2_image}`,
+        image: briefIntroductionCard.column_2_image.startsWith('http') ? briefIntroductionCard.column_2_image.replace('http:', 'https:') : `https:${briefIntroductionCard.column_2_image}`,
         item: items,
     };
 }

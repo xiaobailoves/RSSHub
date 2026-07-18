@@ -6,7 +6,7 @@ import cache from '@/utils/cache';
 import logger from '@/utils/logger';
 import ofetch from '@/utils/ofetch';
 import { parseDate } from '@/utils/parse-date';
-import puppeteer, { getPuppeteerPage } from '@/utils/puppeteer';
+import playwright, { getPlaywrightPage } from '@/utils/playwright';
 
 // Common headers for requests
 const getHeaders = (cookie?: string) => ({
@@ -58,12 +58,12 @@ const getUser = (url, cache) =>
                 userPageData = userPageData._rawValue || userPageData;
                 notes = notes._rawValue || notes;
 
-                // Cannot get collect data without puppeteer
+                // Cannot get collect data without Playwright
                 return { userPageData, notes, collect: '' };
             }
 
-            // Use puppeteer
-            const { page, destory } = await getPuppeteerPage(url, {
+            // Use Playwright
+            const { page, destroy } = await getPlaywrightPage(url, {
                 onBeforeLoad: async (page) => {
                     await page.setRequestInterception(true);
                     page.on('request', (request) => {
@@ -107,7 +107,7 @@ const getUser = (url, cache) =>
 
                 return { userPageData, notes, collect };
             } finally {
-                await destory();
+                await destroy();
             }
         },
         config.cache.routeExpire,
@@ -127,8 +127,8 @@ const getBoard = (url, cache) =>
                 return state.Main;
             }
 
-            // Use puppeteer
-            const browser = await puppeteer();
+            // Use Playwright
+            const browser = await playwright();
             try {
                 const page = await browser.newPage();
                 await page.setRequestInterception(true);
@@ -151,9 +151,9 @@ const getBoard = (url, cache) =>
 const formatText = (text) => text.replaceAll(/(\r\n|\r|\n)/g, '<br>').replaceAll('\t', '&emsp;');
 
 // tag_list.id has nothing to do with its url
-const formatTagList = (tagList) => tagList.reduce((acc, item) => acc + `#${item.name} `, ``);
+const formatTagList = (tagList) => tagList.reduce((acc, item) => acc + `#${item.name} `, '');
 
-const formatImageList = (imageList) => imageList.reduce((acc, item) => acc + `<img src="${item.url}"><br>`, ``);
+const formatImageList = (imageList) => imageList.reduce((acc, item) => acc + `<img src="${item.url}"><br>`, '');
 
 const formatNote = (url, note) => ({
     title: note.title,
