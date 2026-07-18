@@ -1,11 +1,13 @@
-import type { CheerioAPI } from 'cheerio';
+import type { Cheerio, CheerioAPI } from 'cheerio';
 import { load } from 'cheerio';
+import type { Element } from 'domhandler';
+import type { BrowserContext } from 'patchright';
 
 import type { DataItem } from '@/types';
 import cache from '@/utils/cache';
 import logger from '@/utils/logger';
 import { parseRelativeDate } from '@/utils/parse-date';
-import type { Browser, Page } from '@/utils/playwright';
+import type { Page } from '@/utils/playwright';
 
 export const BASE_URL = 'https://www.dailypush.dev';
 
@@ -23,19 +25,19 @@ export interface ArticleItem {
 const allowedRequestTypes = new Set(['document']);
 
 async function preparePage(page: Page) {
-    await page.setRequestInterception(true);
-    page.on('request', (request) => {
+    await page.route('**/*', (route) => {
+        const request = route.request();
         if (allowedRequestTypes.has(request.resourceType())) {
-            request.continue();
+            route.continue();
             return;
         }
 
-        request.abort();
+        route.abort();
     });
 }
 
-export async function fetchPageHtml(browser: Browser, url: string, waitForSelector?: string): Promise<string> {
-    const page = await browser.newPage();
+export async function fetchPageHtml(context: BrowserContext, url: string, waitForSelector?: string): Promise<string> {
+    const page = await context.newPage();
     await preparePage(page);
 
     try {
@@ -67,7 +69,7 @@ function tryParseAsDate(text: string): Date | undefined {
 /**
  * Extract author from article element
  */
-function extractAuthor(article: ReturnType<CheerioAPI>): DataItem['author'] {
+function extractAuthor(article: Cheerio<Element>): DataItem['author'] {
     const container = article.find('.flex.items-center.gap-3').first();
     if (container.length === 0) {
         return undefined;
@@ -133,7 +135,7 @@ function extractAuthor(article: ReturnType<CheerioAPI>): DataItem['author'] {
 /**
  * Extract categories/tags from article element
  */
-function extractCategories(article: ReturnType<CheerioAPI>, $: CheerioAPI): string[] {
+function extractCategories(article: Cheerio<Element>, $: CheerioAPI): string[] {
     return article
         .find('a[href^="/"]')
         .toArray()
@@ -143,7 +145,7 @@ function extractCategories(article: ReturnType<CheerioAPI>, $: CheerioAPI): stri
             const tagText = tagElement.text().trim();
 
             // Skip summary/stats links and navigation
-            if (tagHref && tagText && !tagHref.includes('article/') && !tagHref.includes('Summary') && tagText.length < 50 && !/^(Summary|stats|About|Tags|Toggle|Trending|Latest|Previous|Next)$/i.test(tagText)) {
+            if (tagHref && tagText && !tagHref.includes('article/') && !tagHref.includes('Summary') && tagText.length < 50 && !/^(?:Summary|stats|About|Tags|Toggle|Trending|Latest|Previous|Next)$/i.test(tagText)) {
                 return tagText;
             }
             return null;
@@ -154,7 +156,7 @@ function extractCategories(article: ReturnType<CheerioAPI>, $: CheerioAPI): stri
 /**
  * Extract publication date from article element
  */
-function extractPubDate(article: ReturnType<CheerioAPI>): Date | undefined {
+function extractPubDate(article: Cheerio<Element>): Date | undefined {
     const container = article.find('.flex.items-center.gap-3').first();
     if (container.length === 0) {
         return undefined;
@@ -207,7 +209,7 @@ function extractPubDate(article: ReturnType<CheerioAPI>): Date | undefined {
 /**
  * Parse a single article element into an ArticleItem
  */
-function parseArticle(article: ReturnType<CheerioAPI>, $: CheerioAPI, baseUrl: string): (DataItem & ArticleItem) | null {
+function parseArticle(article: Cheerio<Element>, $: CheerioAPI, baseUrl: string): (DataItem & ArticleItem) | null {
     // Find the title link in h2 > a
     const titleLink = article.find('h2 a[href^="http"]');
     if (titleLink.length === 0) {
@@ -259,9 +261,9 @@ export function parseArticles($: CheerioAPI, baseUrl: string): ArticleItem[] {
 
 /**
  * Enhance items with full summaries from dailypush article pages.
- * Uses the provided browser; opens a new tab per URL (document requests only). Caller must close the browser.
+ * Uses the provided context; opens a new tab per URL (document requests only). Caller must close the context.
  */
-export async function enhanceItemsWithSummaries(browser: Browser, items: ArticleItem[]): Promise<DataItem[]> {
+export async function enhanceItemsWithSummaries(context: BrowserContext, items: ArticleItem[]): Promise<DataItem[]> {
     const itemsWithUrl = items.filter((item) => item.dailyPushUrl !== undefined);
     const itemsWithoutUrl: DataItem[] = items.filter((item) => item.dailyPushUrl === undefined);
 
@@ -269,7 +271,7 @@ export async function enhanceItemsWithSummaries(browser: Browser, items: Article
         itemsWithUrl.map((item) =>
             cache.tryGet(item.dailyPushUrl!, async () => {
                 try {
-                    const html = await fetchPageHtml(browser, item.dailyPushUrl!, 'p.font-ibm-plex-sans.leading-relaxed');
+                    const html = await fetchPageHtml(context, item.dailyPushUrl!, 'p.font-ibm-plex-sans.leading-relaxed');
                     const $ = load(html);
                     const summary = $('p.font-ibm-plex-sans.leading-relaxed');
                     if (summary.length > 0 && summary.text().trim()) {

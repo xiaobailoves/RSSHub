@@ -183,7 +183,7 @@ async function handler(ctx) {
         },
     });
 
-    const data = JSON.parse(response.data.match(/null\(\[({.*})]\)/)[1]);
+    const data = JSON.parse(response.data.match(/null\(\[(\{.*\})\]\)/)[1]);
 
     let items: DataItem[];
 
@@ -194,7 +194,7 @@ async function handler(ctx) {
                 category: item.tags,
                 description: item.text,
                 link: `${rootUrl}${item.htmlUrl}`,
-                pubDate: timezone(parseDate(item.publishDate), +8),
+                pubDate: timezone(parseDate(item.publishDate), 8),
             }));
             break;
 

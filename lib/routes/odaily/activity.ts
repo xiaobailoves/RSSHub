@@ -43,7 +43,7 @@ async function handler(ctx) {
     let items = response.data.data.items.data.map((item) => ({
         title: item.title,
         link: `${rootUrl}/activity/${item.id}`,
-        pubDate: timezone(parseDate(item.published_at), +8),
+        pubDate: timezone(parseDate(item.published_at), 8),
     }));
 
     items = await Promise.all(
@@ -54,7 +54,7 @@ async function handler(ctx) {
                     url: item.link,
                 });
 
-                const content = load(detailResponse.data.match(/"content":"(.*)"}},"secondaryList":/)[1]);
+                const content = load(detailResponse.data.match(/"content":"(.*)"\}\},"secondaryList":/)[1]);
 
                 content('img').each((_, el) => {
                     content(el).attr(

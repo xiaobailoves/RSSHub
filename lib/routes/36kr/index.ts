@@ -1,7 +1,6 @@
 import { load } from 'cheerio';
 
 import type { Route } from '@/types';
-import cache from '@/utils/cache';
 import { getSubPath } from '@/utils/common-utils';
 import got from '@/utils/got';
 import { parseDate } from '@/utils/parse-date';
@@ -48,7 +47,7 @@ async function handler(ctx) {
 
     const $ = load(response.data);
 
-    const data = JSON.parse(response.data.match(/"itemList":(\[.*?])/)[1]);
+    const data = JSON.parse(response.data.match(/"itemList":(\[.*?\])/)[1]);
 
     let items = data
         .slice(0, ctx.req.query('limit') ? Number.parseInt(ctx.req.query('limit')) : 30)
@@ -64,12 +63,12 @@ async function handler(ctx) {
             };
         });
 
-    if (!/^\/(search|newsflashes)/.test(path)) {
-        items = await Promise.all(items.map((item) => ProcessItem(item, cache.tryGet)));
+    if (!/^\/(?:search|newsflashes)/.test(path)) {
+        items = await Promise.all(items.map((item) => ProcessItem(item)));
     }
 
     return {
-        title: `36氪 - ${$('title').text().split('_')[0]}`,
+        title: `36氪 - ${$('title').text().split('_', 1)[0]}`,
         link: currentUrl,
         item: items,
     };

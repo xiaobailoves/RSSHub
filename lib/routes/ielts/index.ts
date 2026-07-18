@@ -28,19 +28,19 @@ async function handler() {
     const html = await cache.tryGet(
         targetUrl,
         async () => {
-            const browser = await playwright();
-            const page = await browser.newPage();
-            await page.setRequestInterception(true);
-            page.on('request', (request) => {
-                request.resourceType() === 'document' || request.resourceType() === 'script' ? request.continue() : request.abort();
+            const context = await playwright();
+            const page = await context.newPage();
+            await page.route('**/*', (route) => {
+                const request = route.request();
+                request.resourceType() === 'document' || request.resourceType() === 'script' ? route.continue() : route.abort();
             });
             await page.goto(targetUrl, {
                 waitUntil: 'domcontentloaded',
             });
             await page.waitForSelector('div.container');
 
-            const html = await page.evaluate(() => document.documentElement.innerHTML);
-            await browser.close();
+            const html = await page.evaluate(() => document.documentElement.getHTML());
+            await context.close();
             return html;
         },
         config.cache.routeExpire,
@@ -56,7 +56,7 @@ async function handler() {
             return {
                 title: $elem.find('a').text(),
                 link: $elem.find('a').attr('href'),
-                pubDate: timezone(parseDate($elem.find('span').eq(-1).text().replaceAll(/[[\]]/g, '').trim(), +8)),
+                pubDate: timezone(parseDate($elem.find('span').eq(-1).text().replaceAll(/[[\]]/g, '').trim(), 8)),
             };
         });
 

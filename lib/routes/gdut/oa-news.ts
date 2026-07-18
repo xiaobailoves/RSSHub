@@ -112,7 +112,7 @@ async function handler(ctx) {
         title: item.title,
         guid: item.id,
         link: site + '/newsData.do?method=newsView&newsId=' + item.id,
-        pubDate: timezone(parseDate(item.publishDate), +8),
+        pubDate: timezone(parseDate(item.publishDate), 8),
         author: item.publishUserDepart,
         category: item.typeName,
     }));
@@ -177,7 +177,7 @@ async function handler(ctx) {
                             delete el.attribs.style;
                         }
                     }
-                    if (el.attribs.class && el.attribs.class.trim().startsWith('Mso')) {
+                    if (el.attribs.class && el.attribs.class.trimStart().startsWith('Mso')) {
                         delete el.attribs.class;
                     }
                     if (el.attribs.lang) {

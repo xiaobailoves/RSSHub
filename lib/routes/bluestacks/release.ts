@@ -1,4 +1,4 @@
-import * as cheerio from 'cheerio';
+import { load } from 'cheerio';
 
 import type { Route } from '@/types';
 import cache from '@/utils/cache';
@@ -32,21 +32,21 @@ export const route: Route = {
 };
 
 async function handler() {
-    const browser = await playwright();
-    const page = await browser.newPage();
-    await page.setRequestInterception(true);
-    page.on('request', (request) => {
-        request.resourceType() === 'document' || request.resourceType() === 'script' ? request.continue() : request.abort();
+    const context = await playwright();
+    const page = await context.newPage();
+    await page.route('**/*', (route) => {
+        const request = route.request();
+        request.resourceType() === 'document' || request.resourceType() === 'script' ? route.continue() : route.abort();
     });
     await page.goto(pageUrl, {
         waitUntil: 'domcontentloaded',
     });
-    const res = await page.evaluate(() => document.documentElement.innerHTML);
+    const res = await page.evaluate(() => document.documentElement.getHTML());
     await page.close();
 
-    const $ = cheerio.load(res);
+    const $ = load(res);
 
-    const items = $('div h3 a')
+    const list = $('div h3 a')
         .toArray()
         .map((item) => {
             item = $(item);
@@ -56,19 +56,19 @@ async function handler() {
             };
         });
 
-    await Promise.all(
-        items.map((item) =>
+    const items = await Promise.all(
+        list.map((item) =>
             cache.tryGet(item.link, async () => {
-                const page = await browser.newPage();
-                await page.setRequestInterception(true);
-                page.on('request', (request) => {
-                    request.resourceType() === 'document' || request.resourceType() === 'script' ? request.continue() : request.abort();
+                const page = await context.newPage();
+                await page.route('**/*', (route) => {
+                    const request = route.request();
+                    request.resourceType() === 'document' || request.resourceType() === 'script' ? route.continue() : route.abort();
                 });
                 await page.goto(item.link, {
                     waitUntil: 'domcontentloaded',
                 });
-                const res = await page.evaluate(() => document.documentElement.innerHTML);
-                const $ = cheerio.load(res);
+                const res = await page.evaluate(() => document.documentElement.getHTML());
+                const $ = load(res);
                 await page.close();
 
                 item.description = $('div.article__body').html();
@@ -79,7 +79,7 @@ async function handler() {
         )
     );
 
-    await browser.close();
+    await context.close();
 
     return {
         title: $('.article__title').text().trim(),

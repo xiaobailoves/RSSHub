@@ -143,7 +143,7 @@ async function handler(ctx) {
                 });
 
                 item.author = content('.fl.black').first().text();
-                item.pubDate = timezone(parseDate(content('span.fl.gray').first().attr('title')), +8);
+                item.pubDate = timezone(parseDate(content('span.fl.gray').first().attr('title')), 8);
 
                 const readTpc = content('#read_tpc').first();
                 const copyLink = content('#copytext')?.first()?.text();
@@ -164,7 +164,7 @@ async function handler(ctx) {
                     }
                 }
                 if (!item.enclosure_url) {
-                    const hashMatch = readTpcHtml.match(/哈希校验[^;]*;\s*([a-fA-F0-9]{40})\s*[;；]/);
+                    const hashMatch = readTpcHtml.match(/哈希校验[^;]*;\s*([a-f0-9]{40})\s*[;；]/i);
                     const magnetFromHash = hashMatch ? `magnet:?xt=urn:btih:${hashMatch[1]}` : null;
                     const magnetFromText = magnetText.match(/magnet:\?xt=urn:btih:[^\s"'<>]+/)?.[0];
                     const magnetLink = magnetFromText ?? readTpcHtml.match(/magnet:\?xt=urn:btih:[^\s"'<>]+/)?.[0] ?? magnetFromHash ?? copyLink;

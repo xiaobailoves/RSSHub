@@ -30,7 +30,7 @@ function getDomList($, detailUrl) {
 export function getItemList($, detailUrl, second) {
     const encoded = $('.article script[type]')
         .text()
-        .match(/return p}\('(.*)',(\d+),(\d+),'(.*)'.split\(/);
+        .match(/return p\}\('(.*)',(\d+),(\d+),'(.*)'.split\(/);
     // 若 script 标签没有内容，直接解析 dom
     if (!encoded) {
         return getDomList($, detailUrl);
@@ -45,7 +45,7 @@ export function getItemList($, detailUrl, second) {
     const { downurls } = second && data.Data.length > 1 ? data.Data[1] : data.Data[0];
 
     return downurls.map((item) => {
-        const [title, downurl] = item.split('$');
+        const [title, downurl] = item.split('$', 2);
         const urlType = getUrlType(downurl);
         // only magnet need compose trackers
         const enclosureUrl = urlType === 'magnet' ? composeMagnetUrl(downurl) : downurl;

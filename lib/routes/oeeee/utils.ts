@@ -1,11 +1,12 @@
 import { load } from 'cheerio';
 
+import cache from '@/utils/cache';
 import got from '@/utils/got';
 import { parseDate } from '@/utils/parse-date';
 import timezone from '@/utils/timezone';
 
-const parseArticle = (item, tryGet) =>
-    tryGet(item.link, async () => {
+const parseArticle = (item) =>
+    cache.tryGet(item.link, async () => {
         const detailResponse = await got({
             method: 'get',
             url: item.link,
@@ -20,9 +21,9 @@ const parseArticle = (item, tryGet) =>
             item.description +=
                 content('.post-cont')
                     .html()
-                    .replaceAll(/data:image\S*=="\s*\n*\s*original="/g, '') ?? '';
+                    .replaceAll(/data:image\S*=="\s*original="/g, '') ?? '';
             if (!item.pubDate) {
-                item.pubDate = timezone(parseDate(content('.introduce').text().split()), +8);
+                item.pubDate = timezone(parseDate(content('.introduce').text().split()), 8);
             }
         }
         // oeeee news page:

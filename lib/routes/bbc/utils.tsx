@@ -50,7 +50,8 @@ type Block = {
 
 const applyAttributes = (content: JSX.Element | string, attributes?: BlockAttribute[]): JSX.Element | string => {
     let result: JSX.Element | string = content;
-    for (const attribute of attributes ?? []) {
+    const attributeList = attributes ?? [];
+    for (const attribute of attributeList) {
         switch (attribute) {
             case 'bold':
                 result = <strong>{result}</strong>;
@@ -355,7 +356,7 @@ export const extractInitialData = ($: CheerioAPI): any => {
     const initialDataText = JSON.parse(
         $('script:contains("window.__INITIAL_DATA__")')
             .text()
-            .match(/window\.__INITIAL_DATA__\s*=\s*(.*);/)?.[1] ?? '"{}"'
+            .match(/window\.__INITIAL_DATA__\s*=\s*(\S.*)?;/)?.[1] ?? '"{}"'
     );
 
     return JSON.parse(initialDataText);

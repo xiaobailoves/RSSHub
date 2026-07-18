@@ -41,7 +41,7 @@ async function handler(ctx) {
     const response = await got.get(currentUrl);
     const $ = load(response.data);
     const lists = $('div.c-box > div > div.c-zx-list > ul > li');
-    const reg = /日期：(.*?(\s\(.*?\))?)\s/;
+    const reg = /日期：(.*?(?:\s\(.*?\))?)\s/;
     const list = lists.toArray().map((item) => {
         item = $(item).find('div');
         let date = reg.exec(item.find('div.r > p.other').text())[1];
@@ -56,7 +56,7 @@ async function handler(ctx) {
         }
         return {
             title: item.find('div.r > p.r-top > span > a').text(),
-            pubDate: timezone(date, +8),
+            pubDate: timezone(date, 8),
             description: item.find('div.r > p.desc').text(),
             link: item.find('div.r > p.r-top > span > a').attr('href'),
         };

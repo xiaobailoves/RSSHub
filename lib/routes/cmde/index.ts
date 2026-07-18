@@ -18,18 +18,18 @@ export const route: Route = {
 async function handler(ctx) {
     const cate = ctx.req.param('cate') ?? 'xwdt/zxyw';
     const url = `${rootURL}/${cate}/`;
-    const browser = await playwright();
+    const context = await playwright();
     const data = await cache.tryGet(url, async () => {
-        const page = await browser.newPage();
-        await page.setRequestInterception(true);
-        page.on('request', (request) => {
-            request.resourceType() === 'document' || request.resourceType() === 'script' ? request.continue() : request.abort();
+        const page = await context.newPage();
+        await page.route('**/*', (route) => {
+            const request = route.request();
+            request.resourceType() === 'document' || request.resourceType() === 'script' ? route.continue() : route.abort();
         });
         await page.goto(url, {
             waitUntil: 'domcontentloaded',
         });
         await page.waitForSelector('.list');
-        const html = await page.evaluate(() => document.documentElement.innerHTML);
+        const html = await page.evaluate(() => document.documentElement.getHTML());
         await page.close();
 
         const $ = load(html);
@@ -52,27 +52,27 @@ async function handler(ctx) {
     const items = await Promise.all(
         data.items.map((item) =>
             cache.tryGet(item.link, async () => {
-                const page = await browser.newPage();
-                await page.setRequestInterception(true);
-                page.on('request', (request) => {
-                    request.resourceType() === 'document' || request.resourceType() === 'script' ? request.continue() : request.abort();
+                const page = await context.newPage();
+                await page.route('**/*', (route) => {
+                    const request = route.request();
+                    request.resourceType() === 'document' || request.resourceType() === 'script' ? route.continue() : route.abort();
                 });
                 await page.goto(item.link, {
                     waitUntil: 'domcontentloaded',
                 });
                 await page.waitForSelector('.text');
 
-                const html = await page.evaluate(() => document.documentElement.innerHTML);
+                const html = await page.evaluate(() => document.documentElement.getHTML());
                 await page.close();
                 const $ = load(html);
                 item.description = $('.text').html();
-                item.pubDate = timezone(parseDate($('meta[name="PubDate"]').attr('content')), +8);
+                item.pubDate = timezone(parseDate($('meta[name="PubDate"]').attr('content')), 8);
                 return item;
             })
         )
     );
 
-    await browser.close();
+    await context.close();
 
     return {
         title: data.title,

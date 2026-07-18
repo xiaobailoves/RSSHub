@@ -27,20 +27,19 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                # playwright install hangs in node v26.1.0, https://github.com/microsoft/playwright/issues/40724
-                node-version: [26.0.0, lts/*, lts/-1]
+                node-version: [latest, lts/*]
         name: Vitest on Node ${{ matrix.node-version }}
         steps:
-            - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-            - uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093 # v6.0.8
-            - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+            - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+            - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+            - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
               with:
                   node-version: ${{ matrix.node-version }}
                   cache: 'pnpm'
             - name: Install dependencies (pnpm)
               run: pnpm i
             - name: Run postinstall script for dependencies
-              run: pnpm rb && pnpm exec playwright install chromium
+              run: pnpm rb && pnpm exec patchright install chromium
             - name: Build routes
               run: pnpm build
             - name: Build worker routes
@@ -51,9 +50,11 @@ jobs:
               run: pnpm run vitest:coverage --reporter=github-actions
               env:
                   REDIS_URL: redis://localhost:${{ job.services.redis.ports['6379'] }}/
+            - name: Test worker runtime (workerd)
+              run: pnpm run vitest:workerd
             - name: Upload coverage to Codecov
               if: ${{ matrix.node-version == 'lts/*' }}
-              uses: codecov/codecov-action@e79a6962e0d4c0c17b229090214935d2e33f8354 # v6.0.1
+              uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
               with:
                   token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos as documented, but seems broken
 
@@ -63,7 +64,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                node-version: [26.0.0, lts/*, lts/-1]
+                node-version: [latest, lts/*]
                 chromium:
                     - name: bundled Chromium
                       dependency: ''
@@ -76,9 +77,9 @@ jobs:
                       environment: '{ "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD": "1" }'
         name: Vitest Playwright on Node ${{ matrix.node-version }} with ${{ matrix.chromium.name }}
         steps:
-            - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-            - uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093 # v6.0.8
-            - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+            - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+            - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+            - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
               with:
                   node-version: ${{ matrix.node-version }}
                   cache: 'pnpm'
@@ -91,12 +92,12 @@ jobs:
               run: pnpm build
             - name: Install bundled Chromium
               if: ${{ matrix.chromium.dependency == '' }}
-              run: pnpm exec playwright install chromium
+              run: pnpm exec patchright install chromium
             - name: Install Chromium
               if: ${{ matrix.chromium.dependency != '' }}
               # 'chromium-browser' from Ubuntu APT repo is a dummy package. Its version (85.0.4183.83) means
               # nothing since it calls Snap (disgusting!) to install Chromium, which should be up-to-date.
-              # That's not really a problem since the Chromium-bundled Docker image is based on Debian bookworm,
+              # That's not really a problem since the Chromium-bundled Docker image is based on Debian trixie,
               # which provides up-to-date native packages.
               run: |
                   set -eux
@@ -122,12 +123,12 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                node-version: [26, 24, 22]
+                node-version: [26, 24]
         name: Build radar and maintainer on Node ${{ matrix.node-version }}
         steps:
-            - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-            - uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093 # v6.0.8
-            - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+            - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+            - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+            - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
               with:
                   node-version: ${{ matrix.node-version }}
                   cache: 'pnpm'
@@ -148,7 +149,7 @@ jobs:
             pull-requests: write
             contents: write
         steps:
-            - uses: fastify/github-action-merge-dependabot@30c3f8f14a4f7b315ba38dbc1b793d27128fef82 # v3.12.0
+            - uses: fastify/github-action-merge-dependabot@73ec4cbb5e56df5591eae286972d5b2201ffe90f # v3.15.0
               with:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   target: patch
